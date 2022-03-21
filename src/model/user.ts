@@ -12,7 +12,7 @@ export interface IUser {
   isAdmin: boolean;
 }
 
-interface IUserDocument extends IUser, Document {}
+export interface IUserDocument extends IUser, Document {}
 
 interface IUserModel extends Model<IUserDocument> {
   findByCredentials: (
@@ -52,6 +52,7 @@ const userSchema = new Schema<IUserDocument, IUserModel>({
 userSchema.methods.toJSON = function () {
   const user = this.toObject();
   delete user.password;
+  delete user.isAdmin;
   return user;
 };
 

@@ -14,6 +14,11 @@ export const createUserDto = object({
     }),
 });
 
+export const updateUserDto = object({
+  firstName: string().required().trim().min(2),
+  lastName: string().required().trim().min(2),
+});
+
 export const loginUserDto = object({
   email: string().required().trim().lowercase().email(),
   password: string().required().trim().min(6),
