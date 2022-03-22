@@ -78,4 +78,21 @@ export const updateUserById: RequestHandler = async (req, res, next) => {
   res.status(200).json(existedUser);
 };
 
-export const deleteUserById: RequestHandler = async (req, res, next) => {};
+export const deleteUserById: RequestHandler = async (req, res, next) => {
+  const id = req.params.id as string;
+
+  let existedUser;
+  try {
+    existedUser = (await User.findOne({ _id: id })) as IUserDocument;
+
+    if (!existedUser) {
+      return next(HttpError.Forbidden());
+    }
+
+    existedUser.remove();
+  } catch (err: any) {
+    return next(HttpError.InternalServerError(err.message));
+  }
+
+  res.status(200).json({ message: "User successfully deleted." });
+};
