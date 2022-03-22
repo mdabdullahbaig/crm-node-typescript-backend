@@ -4,6 +4,7 @@ export interface User {
   email: string;
   password: string;
   isAdmin: boolean;
+  isAgent: boolean;
 
   createUser: (
     firstName_body: string,
