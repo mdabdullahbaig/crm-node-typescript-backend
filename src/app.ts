@@ -5,6 +5,7 @@ import logger from "./utils/logger";
 import { errorHandler } from "./middleware/errorHandler";
 import userRoute from "./route/userRoute";
 import authRoute from "./route/authRoute";
+import leadRoute from "./route/leadRoute";
 import mongoose from "mongoose";
 import HttpError from "./utils/HttpError";
 
@@ -12,20 +13,22 @@ const app: Application = express();
 const PORT = process.env.PORT;
 const DB_URL = process.env.DB_URL as string;
 
+// Application Level Middleware
 // Parsing incoming request as json or urlencoded
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Route Middlewale
+// Route Level Middleware
 app.use("/api/users", userRoute);
 app.use("/api/auth", authRoute);
+app.use("/api/leads", leadRoute);
 
-// Handling, when we don't have match routes
+// Route Not Match Handling Middleware
 app.use((req: Request, res: Response, next: NextFunction) => {
   next(HttpError.NotFound("Route Not Found"));
 });
 
-// Error Handling
+// Error Handling Middleware
 app.use(errorHandler);
 
 mongoose

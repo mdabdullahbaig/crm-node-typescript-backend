@@ -37,7 +37,7 @@ export const createUser: RequestHandler = async (req, res, next) => {
   });
 };
 
-export const getUserByEmail: RequestHandler = async (req, res, next) => {};
+export const getUserProfile: RequestHandler = async (req, res, next) => {};
 
 export const getUsers: RequestHandler = async (req, res, next) => {
   let users;
@@ -48,11 +48,10 @@ export const getUsers: RequestHandler = async (req, res, next) => {
     if (users.length < 1) {
       return next(new HttpError(200, "As of now there is no user present."));
     }
-
-    res.status(200).json(users);
   } catch (err: any) {
     return next(HttpError.InternalServerError(err.message));
   }
+  res.status(200).json(users);
 };
 
 export const updateUserById: RequestHandler = async (req, res, next) => {
