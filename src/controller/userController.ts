@@ -29,7 +29,7 @@ export const createUser: RequestHandler = async (req, res, next) => {
   try {
     await user.save();
   } catch (err: any) {
-    return next(HttpError.InternalServerError(err.message));
+    next(HttpError.BadRequest(err.message));
   }
 
   res.status(201).json({
@@ -44,34 +44,38 @@ export const getUsers: RequestHandler = async (req, res, next) => {
 
   try {
     users = (await User.find({})) as IUserDocument[];
-
-    if (users.length < 1) {
-      return next(new HttpError(200, "As of now there is no user present."));
-    }
   } catch (err: any) {
     return next(HttpError.InternalServerError(err.message));
   }
+
+  if (users.length < 1) {
+    return next(HttpError.NotFound());
+  }
+
   res.status(200).json(users);
 };
 
 export const updateUserById: RequestHandler = async (req, res, next) => {
   const id = req.params.id as string;
-  const { firstName, lastName } = req.body as IUser;
+  const updates = Object.keys(req.body);
 
-  let existedUser;
+  let existedUser: any;
   try {
-    existedUser = (await User.findOne({ _id: id })) as IUserDocument;
-
-    if (!existedUser) {
-      return next(HttpError.Forbidden());
-    }
-
-    existedUser.firstName = firstName;
-    existedUser.lastName = lastName;
-
-    await existedUser.save();
+    existedUser = (await User.findById(id)) as IUserDocument;
   } catch (err: any) {
     return next(HttpError.InternalServerError(err.message));
+  }
+
+  if (!existedUser) {
+    return next(HttpError.NotFound());
+  }
+
+  updates.forEach((update) => (existedUser[update] = req.body[update]));
+
+  try {
+    await existedUser.save();
+  } catch (err: any) {
+    next(HttpError.BadRequest(err.message));
   }
 
   res.status(200).json(existedUser);
@@ -82,15 +86,19 @@ export const deleteUserById: RequestHandler = async (req, res, next) => {
 
   let existedUser;
   try {
-    existedUser = (await User.findOne({ _id: id })) as IUserDocument;
-
-    if (!existedUser) {
-      return next(HttpError.Forbidden());
-    }
-
-    existedUser.remove();
+    existedUser = (await User.findById(id)) as IUserDocument;
   } catch (err: any) {
     return next(HttpError.InternalServerError(err.message));
+  }
+
+  if (!existedUser) {
+    return next(HttpError.NotFound());
+  }
+
+  try {
+    existedUser.remove();
+  } catch (err: any) {
+    next(HttpError.BadRequest(err.message));
   }
 
   res.status(200).json({ message: "User successfully deleted." });
