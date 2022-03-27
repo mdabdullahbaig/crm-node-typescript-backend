@@ -7,7 +7,7 @@ export interface ILead {
   company: string;
   walkingDate: Date;
   leadSource: string;
-  leadAgent?: Types.ObjectId;
+  leadOwner?: Types.ObjectId;
 }
 
 export interface ILeadDocument extends ILead, Document {}
@@ -33,7 +33,7 @@ const leadSchema = new Schema<ILeadDocument, ILeadModel>({
   company: String,
   walkingDate: Date,
   leadSource: String,
-  leadAgent: {
+  leadOwner: {
     type: Types.ObjectId,
     ref: "User",
   },
